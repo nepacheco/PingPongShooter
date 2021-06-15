@@ -24,25 +24,24 @@ width = 1.525; % [m]
 height = 0.1525; % [m]
 
 p_o = [-length/2;0;0]; % [m]
-p_i = [0;0;height + ball_diam/2]; % [m]
-p_f = [length/2;0;0]; % [m]
+p_i = [length*.8-length/2;0.4;height + ball_diam/2]; % [m]
+p_f = [length/2;0.5;0]; % [m]
 
-[V,theta,t,coef] = CalculateInverseProjectileMotion([p_o p_i p_f]);
+[V,theta,phi,t] = CalculateInverseProjectileMotion([p_o p_i p_f]);
 
-y = @(x)coef(1).*x.^2 + coef(2).*x + coef(3);
+% Determine Trajectory based on time
+traj = @(t) p_o + V.*[cos(phi)*cos(theta);sin(phi)*cos(theta); sin(theta)].*t...
+    + 1/2.*t.^2.*[0;0;-9.8];
 time_range = 0:0.001:t;
 
-Vy_o = V*sin(theta);
-g = -9.8;
-y_test = p_o(2) + Vy_o*t + 1/2*g*t^2;
-x = -length/2:0.01:length/2;
-traj = [x;zeros(size(x));y(x)];
+DisplayTrajectoryOnTable(traj(time_range),[length,width,height])
 
-DisplayTrajectoryOnTable(traj,[length,width,height])
-
-
+Vz_o = V*sin(theta);
+g = -9.81;
 
 figure
-plot(time_range, p_o(2) + Vy_o.*time_range + 1/2.*g.*time_range.^2);
+plot(time_range, p_o(2) + Vz_o.*time_range + 1/2.*g.*time_range.^2);
+xlabel("Time")
+ylabel("Y Position")
 axis equal
 grid on
