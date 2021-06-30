@@ -24,8 +24,8 @@ width = 1.525; % [m]
 height = 0.1525; % [m]
 
 p_o = [-length/2;0;0]; % [m]
-p_i = [0;0.25;height + ball_diam/2]; % [m]
-p_f = [length/2;0.5;0]; % [m]
+p_i = [0;0;height + ball_diam/2]; % [m]
+p_f = [length/2;0;0]; % [m]
 
 [V,theta,phi,t] = CalculateInverseProjectileMotion([p_o p_i p_f]);
 

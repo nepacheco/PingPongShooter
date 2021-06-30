@@ -1,5 +1,10 @@
 function DisplayTrajectoryOnTable(traj,table_size)
 
+arguments
+    traj(3,:) double 
+    table_size(1,3) = [2.74,1.525,0.1525];
+end
+
 % Side View
 subplot(3,1,1);
 DisplayTrajectory(traj);

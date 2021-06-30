@@ -13,7 +13,7 @@ end
 poses = poses - poses(:,1);
 
 % error checking on positions
-if ~(abs(poses(1,2)/poses(2,2) - poses(1,3)/poses(2,3)) < eps)
+if ~(abs(poses(1,2)*poses(2,3) - poses(1,3)*poses(2,2)) < eps)
     error("Nonlinear relationship between x and y values");
 end
 
