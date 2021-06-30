@@ -20,7 +20,7 @@ v_t = sqrt(2*m*g/(C_d*rho*A)); % [m/s] terminal velocity of ping pong ball
 v0 = V*[cos(theta);sin(theta)];
 x0 = [0;start_pose(3)];
 
-tspan = linspace(0,2,10000);
+tspan = linspace(0,10,10000);
 % x_dot = f(x) -> x = [vx;vz;x;z]
 f = @(t,x) [-g/v_t^2 * sqrt(x(1)^2 + x(2)^2) * x(1);
           -g/v_t^2 * (sqrt(x(1)^2 + x(2)^2) * x(2) + v_t^2);

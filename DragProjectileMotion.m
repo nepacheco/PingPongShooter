@@ -7,9 +7,9 @@ width = 1.525; % [m]
 height = 0.1525; % [m]
 g = 9.8;
 
-p_o = [0;0;0]; % [m]
-p_i = [0;0;height + ball_diam/2]; % [m]
-p_f = [length;0.5;0]; % [m]
+po = [0;0;0]; % [m]
+pi = [0;0;height + ball_diam/2]; % [m]
+pf = [length;0.5;0]; % [m]
 
 % source:  https://link.springer.com/content/pdf/10.1111%2Fj.1747-1567.2006.00017.x.pdf
 C_d = 0.445; % Drag coefficient of ping-pong ball from
@@ -46,14 +46,14 @@ g = 9.81; % [m/s^2] gravity constant
 A = pi*(d/2)^2; % [m^2] cross-sectional area
 
 v_t = sqrt(2*m*g/(C_d*rho*A)); % [m/s] terminal velocity of ping pong ball
-theta = deg2rad(20); % [rad]
-speed = 11.176; % [m/s]
+theta = deg2rad(45); % [rad]
+speed = 30; % [m/s]
 
 length = 2.74; % [m]
 width = 1.525; % [m]
 height = 0.1525; % [m]
 
-[traj,t,x] = CalculateForwardDrag(speed,theta,[-length/2;0;0],deg2rad(10),0);
+[traj,t,x] = CalculateForwardDrag(speed,theta,[0;0;0],deg2rad(0),0,'ball_properties',[1/2,0.075,0.145]     );
 
 DisplayTrajectoryOnTable(traj)
 
@@ -84,13 +84,21 @@ title('X Velocity of Ping Pong Ball with simulated drag')
 grid on
 
 
-%%
+%% Using functions to perform inverse drag kinematics and plotting the result
 
-p_o = [-length/2;0;0]; % [m]
-p_i = [0;0;height + ball_diam/2]; % [m]
-p_f = [length/2;0;0]; % [m]
+po = [-length/2;-0.25;0.4]; % [m]
+pi = [0;0.0;height + ball_diam/2+0.1]; % [m]
+pf = [length/2;0.25;0]; % [m]
 
-[V,theta,phi,t] = CalculateInverseDrag([p_o p_i p_f]);
-[traj,t,x] = CalculateForwardDrag(V,theta,p_o,phi,0);
+poses = [po pi pf];
+
+[V,theta,phi,t] = CalculateInverseDrag(poses);
+[traj,t,x] = CalculateForwardDrag(V,theta,po,phi,0);
 
 DisplayTrajectoryOnTable(traj)
+for i = 1:3
+    subplot(3,1,i);
+    hold on
+    plot3(poses(1,:),poses(2,:),poses(3,:),'r.','MarkerSize',30)
+    hold off
+end

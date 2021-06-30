@@ -37,12 +37,14 @@ v_t = sqrt(2*m*g/(C_d*rho*A)); % [m/s] terminal velocity of ping pong ball
 theta = 0.1; % [rad]
 speed = 11.176; % [m/s]
 pos_error = [100;100];
-while norm(pos_error) > 1E-4
+count = 0;
+while norm(pos_error) > 1E-4 && count < 100
     
-    [~,t,x] = CalculateForwardDrag(speed,theta,[0;0;0],deg2rad(0),0);
+    [~,t,x] = CalculateForwardDrag(speed,theta,[0;0;0],deg2rad(0),poses(3,3));
     % Get Final Position error
     dist_error = r(3) - x(end,3);
-    
+%     dist_error_z = poses(3,3) - x(end,4);
+%     dist_error = norm([dist_error_x,dist_error_z]);
     % Get midway height error 
     midway_point = r(1,2);
     midway_height = poses(3,2);
@@ -51,8 +53,9 @@ while norm(pos_error) > 1E-4
     
     pos_error = [dist_error;height_error];
     
-    speed = speed + 0.1*dist_error; 
-    theta = theta + 0.1*height_error;
+    speed = speed + 0.5*dist_error; 
+    theta = theta + 0.2*height_error;
+    count = count + 1;
 end
 
 
