@@ -1,16 +1,15 @@
-function [traj,t,x] = CalculateForwardSpin(V,theta,start_pose,phi,end_condition,options)
+function [traj,t,x] = CalculateForwardSpin(start_pose,velocity,options)
 arguments
-    V (1,1) double % speed of launch [m/s]
-    theta (1,1) double % pitch of launcher [rad]
-    start_pose (3,1) double = [0;0;0] % x y z [m;m;m]
-    phi (1,1) double = 0; % yaw of launcher [rad]
-    end_condition (1,1) double = 0 %[m] the height at which to stop integrating
+    start_pose (3,1) double % x y z [m;m;m]
+    velocity (3,1) double % speed of launch [m/s]
+    options.end_condition (1,1) double = 0 %[m] the height at which to stop integrating
     options.ball_properties (3,1) =  [0.455;0.040;0.0027] % [C_d; diameter; mass]; 
     options.spin (3,1) = zeros(3,1); % vector of direction that indicates vector about which ball is spinning
+    options.alpha (1,1) double = 0; % decay parameter for rotational spin
 end
 
 C_d = options.ball_properties(1); % Drag coefficient of ping-pong ball from
-alpha = 0.5;
+alpha = 0;
 rho = 1.225; % [kg/m^3] Air density at sea level 
 d = options.ball_properties(2); % [m] diamter of ping-pong ball 
 m = options.ball_properties(3); % [kg] mass of ping pong ball
@@ -20,7 +19,7 @@ vol = 4/3*pi*(d/2)^3;
 v_t = sqrt(2*m*g/(C_d*rho*A)); % [m/s] terminal velocity of ping pong ball
 
 
-v0 = V*[cos(theta)*cos(phi);sin(theta)*sin(phi);sin(theta)];
+v0 = velocity;
 x0 = start_pose;
 
 tspan = linspace(0,10,10000);
@@ -47,7 +46,7 @@ f = @(t,x) [-[0 0 g]' - x(1:3)*g*norm(x(1:3))/v_t^2 + cross(x(7:9),x(1:3))*2*vol
 % G = 2*pi*r^2*w , r is radius of cylinder, w is angular velocity of spin
 % [rad/sec]
 
-ode_opts = odeset('Events',@(t,x)myEventsFcn(t,x,end_condition,6));
+ode_opts = odeset('Events',@(t,x)myEventsFcn(t,x,options.end_condition,6));
 [t,x] = ode45(f,tspan,[v0;x0;w0],ode_opts);
 
 traj = [x(:,4), x(:,5), x(:,6)]';

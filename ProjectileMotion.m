@@ -46,36 +46,4 @@ ylabel("Y Position")
 axis equal
 grid on
 
-%% Testing Spin Forward Kinematics
-% vo - initial velocity in 2D
-% po - initial position in 2D
-% vf - final velocity in 2D
-% pf - final position in 2D
-% acceleration is only in y-direction
-
-% y = y_o + vy_o*t + 1/2*g*t^2
-% x = x_o + vx_o*t + 0
-% vy_f = vy_o + g*t
-% vy^2 = vy_o^2 + 2*g*DeltaY
-
-% vx = cos(theta)*||v||
-% vy = sin(theta)*||v||
-
-% if we have p_o and p_f, can we solve for ||v|| and theta
-
-% Ping Pong table is 2.74 m by 1.525 m
-% net height is 0.1525 m
-ball_diam = 0.040; %[m];
-length = 2.74; % [m]
-width = 1.525; % [m]
-height = 0.1525; % [m]
-xo = [-length/2;0;0.2];
-vo = 31;
-theta = deg2rad(20);
-w = [0;400;0]; % max angular speed is 950 rad/sec or 9000 rpm
-% max speed might be 60 rps or 390 rad/sec
-
-[traj,t,x] = CalculateForwardSpin(vo, theta, xo,'spin',w);
-
-DisplayTrajectoryOnTable(traj,[length,width,height])
 
