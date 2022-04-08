@@ -1,4 +1,4 @@
-function [spin, count] = CalculateInverseSpin(initial_pose, final_pose, initial_velocity, ball_properties)
+function [spin, count, velocity] = CalculateInverseSpin(initial_pose, final_pose, velocity, ball_properties, options)
 % CALCULATEINVERSEDRAG - Determines the initial velocity and angle of
 % launch to hit the target point.
 %
@@ -9,34 +9,51 @@ arguments
     % Set 3 points that must be hit by parabola [start mid end]
     initial_pose (3,1) double
     final_pose (3,1) double
-    initial_velocity (3,1) double
-    ball_properties (3,1) double = [0.455;0.040;0.0027] % [C_d; diameter; mass]; 
+    velocity (3,1) double
+    ball_properties (3,1) double = [0.455;0.040;0.0027] % [C_d; diameter; mass];
+    options.min_spin (1,1) double = 0;
+    options.max_spin (1,1) double = 0;
+    options.spin_gains (1,2) double = [100 100];
+    options.vel_gains (1,3) double = [1 1 1];
 end
-
-% source:  https://link.springer.com/content/pdf/10.1111%2Fj.1747-1567.2006.00017.x.pdf
-C_d = ball_properties(1); % Drag coefficient of ping-pong ball from
-rho = 1.225; % [kg/m^3] Air density at sea level 
-d = ball_properties(2); % [m] diamter of ping-pong ball 
-m = ball_properties(3); % [kg] mass of ping pong ball
-g = 9.81; % [m/s^2] gravity constant
-A = pi*(d/2)^2; % [m^2] cross-sectional area
-vol = (4/3)*pi*(d/2)^3;
-v_t = sqrt(2*m*g/(C_d*rho*A)); % [m/s] terminal velocity of ping pong ball
-
+mustBeLessThan(options.max_spin,options.min_spin);
 % Gradient descent to converge on launch angle and launch speed
-spin = zeros(3,1);
+spin = options.min_spin*[0; sqrt(2)/2; sqrt(2)/2];
 pos_error = [100;100];
 count = 0;
+vel_dir = velocity/norm(velocity);
 while norm(pos_error) > 1E-4 && count < 1000
     
-    [~,t,x] = CalculateForwardSpin(initial_pose,initial_velocity,'spin',spin,'ball_properties',ball_properties);
+    [~,t,x] = CalculateForwardSpin(initial_pose,velocity,'spin',spin,'ball_properties',ball_properties);
     % Get Final Position error
     pos_error = final_pose - x(end,4:6)';
-    x_error = final_pose(1) - x(end,4); % Can be handled by top spin
-    y_error = final_pose(2) - x(end,6); % can be handled by side spin
-    spin = spin + diag([0 100 100])*[0;-pos_error(1);pos_error(2)] ;
+    if norm(spin) >= options.max_spin
+        % If we are over the max spin, set spin magnitude to max but
+        % preserve direction. Instead adjust velocity
+        spin = max(options.max_spin*spin/norm(spin),0);
+        velocity = velocity + diag(options.vel_gains)*...
+            [pos_error(1)*vel_dir(1);pos_error(2);pos_error(1)*vel_dir(3)];
+    elseif norm(spin) < options.min_spin
+        % If we are below the min spin, then preserve spin direction but
+        % increase the spin magnitude. Adjust velocity
+        spin = min(options.min_spin*spin/norm(spin),0);
+        velocity = velocity + diag(options.vel_gains)*...
+            [pos_error(1)*vel_dir(1);pos_error(2);pos_error(1)*vel_dir(2)];
+    else
+        % If we are not over max or under min spin, then adjust the spin as normal
+        spin = spin + diag([0 options.spin_gains])*[0;-pos_error(1);pos_error(2)] ;
+    end
     count = count + 1;
 end
 
 
+end
+
+%% Validators
+function mustBeLessThan(b,a)
+    if (b < a)
+        eid = 'Value:ValueTooLarge';
+        msg = ['Must be greater than ', num2str(a)];
+        throwAsCaller(MException(eid,msg));
+    end
 end

@@ -27,12 +27,12 @@ length = 2.74; % [m]
 width = 1.525; % [m]
 height = 0.1525; % [m]
 x0 = [-length/2;0;0.2];
-target = [length/2;0.6;0];
+target = [length/2;-0.6;0];
 theta = deg2rad(10);
 v0 = 31*[cos(theta);0;sin(theta)];
 
-[w, count] = CalculateInverseSpin(x0,target,v0);
+[w, count, velocity] = CalculateInverseSpin(x0,target,v0);
 
-[traj,t,x] = CalculateForwardSpin(x0,v0,'spin',w);
+[traj,t,x] = CalculateForwardSpin(x0,velocity,'spin',w);
 
 DisplayTrajectoryOnTable(traj,[length,width,height])
