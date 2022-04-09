@@ -36,7 +36,7 @@ w0 = options.spin;
 %           0;
 %           0] + [cross(w0,x(1:3))*8/3*pi*(d/2)^3*rho/m;zeros(3,1);w];
       
-f = @(t,x) [-[0 0 g]' - x(1:3)*g*norm(x(1:3))/v_t^2 + cross(x(7:9),x(1:3))*2*vol*rho/m;
+f = @(t,x) [-[0 0 g]' - x(1:3)*norm(x(1:3))*g/v_t^2 + cross(x(7:9),x(1:3))*2*vol*rho/m;
             [x(1) x(2) x(3)]';
             -alpha*x(7:9)*norm(x(7:9)*alpha)];
 

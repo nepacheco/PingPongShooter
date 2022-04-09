@@ -12,7 +12,7 @@ arguments
     velocity (3,1) double
     ball_properties (3,1) double = [0.455;0.040;0.0027] % [C_d; diameter; mass];
     options.min_spin (1,1) double = 0;
-    options.max_spin (1,1) double = 0;
+    options.max_spin (1,1) double = 10000;
     options.spin_gains (1,2) double = [100 100];
     options.vel_gains (1,3) double = [1 1 1];
 end
